@@ -3,6 +3,7 @@
 
 Wrapper for calling [aws-cli](https://github.com/aws/aws-cli) for access keys from an encrypted credentials file.
 
+
 ## Prerequisites
 
 #### MacOS
@@ -20,6 +21,7 @@ __Python, virtualenv__
 __[GnuPG Made Easy (GPGME)](https://www.gnupg.org/related_software/gpgme/)__
 
 - ```brew install gpgme```
+
 
 ## Install
 
@@ -79,7 +81,7 @@ AWS_PROFILE=iam_leet \
 aws-profile-gpg aws s3 ls
 ```
 
-_Note:_ Profiles must be defined in the `AWS_CONFIG_FILE` or you will see this error:
+_Note:_ If you use a non-default `AWS_CONFIG_FILE`, profiles must be defined in specified config or you will see this error:
 
 `Profile not found in config; profile=iam_leet`
 
@@ -105,18 +107,55 @@ aws-profile-gpg aws s3 ls
 * AWS_CONFIG_FILE
     * See [AWS Command Line Interface](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-environment)
     * Defaults to `~/.aws/config`
+    * _Note:_ If you change this, you must define all profiles in the custom config file
 
 * AWS_DEFAULT_PROFILE
     * See [AWS Command Line Interface](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-environment)
     * Defaults to `default`
 
 
+#### Sample Bash Helper Function
+
+```
+$ cat ~/.bashrc
+...
+
+export AWS_DEFAULT_PROFILE=default
+export AWS_DEFAULT_REGION=ca-central-1
+
+export AWS_CONFIG_FILE="${HOME}/Dropbox/aws/config"
+export AWS_ENCRYPTED_CREDENTIALS_FILE="${HOME}/Dropbox/aws/credentials.gpg"
+
+export AWS_PROFILE_GPG_HOME="${HOME}/local/aws-profile-gpg"
+
+function gawsp {
+        $AWS_PROFILE_GPG_HOME/aws-profile-gpg $@
+}
+
+...
+```
+
+Using with terraform, for example:
+
+```
+AWS_PROFILE=terraform gawsp terraform -plan
+```
+
+Or just plain aws, for example:
+
+```
+gawsp aws s3 ls
+```
+
+
 ## Related Links
+
+* Various version of `aws-profile` on GitHub
+    * [https://github.com/search?q=aws-profile](https://github.com/search?q=aws-profile)
+
+* Botocore
+    * [https://github.com/boto/botocore](https://github.com/boto/botocore)
 
 * PyGPGME
     * [https://launchpad.net/pygpgme](https://launchpad.net/pygpgme)
     * [https://pygpgme.readthedocs.io/en/latest/](https://pygpgme.readthedocs.io/en/latest/)
-
-* Inspred by the various version of `aws-profile` on GitHub
-    * [https://github.com/search?q=aws-profile](https://github.com/search?q=aws-profile)
-
