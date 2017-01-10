@@ -7,9 +7,7 @@ If you use an [OpenGPG card](https://en.wikipedia.org/wiki/OpenPGP_card) such as
 
 ## Prerequisites
 
-This guide assumes you are familiar GPG and are able to encrypt your credentials file.
-
-If you are not familiar with GPG, there are a number of [good tutorials online](https://duckduckgo.com/?q=gpg+tutorial).
+This guide assumes you are familiar GPG and are able to encrypt your credentials file.  If you are not familiar with GPG, there are a number of [good tutorials online](https://duckduckgo.com/?q=gpg+tutorial).
 
 #### MacOS
 
