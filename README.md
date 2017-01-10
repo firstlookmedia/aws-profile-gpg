@@ -25,8 +25,6 @@ __[GnuPG Made Easy (GPGME)](https://www.gnupg.org/related_software/gpgme/)__
 
 ## Setup and Install
 
-#### Setup Virtualenv
-
 Download the code:
 
 ```
@@ -47,22 +45,20 @@ Install requirements:
 pip install -r requirments.txt
 ```
 
-#### Install
-
 There are two options documented here for making the script's virtualenv easily accessible:
 
-__1. Adding a wrapper script to $PATH__
+1\. Move the provided wrapper script to a directory in the $PATH:
 
-Add `AWS_PROFILE_GPG_HOME` to `~/.bashrc`:
+- Add `AWS_PROFILE_GPG_HOME` to `~/.bash_profile`:
 
 ```
-$ vim ~/.bashrc
+$ vim ~/.bash_profile
 ...
-$ grep ^AWS ~/.bashrc
+$ grep ^AWS ~/.bash_profile
 export AWS_PROFILE_GPG_HOME=~/local/aws-profile-gpg
 ```
 
-Copy virtualenv wrapper to $PATH:
+- Copy virtualenv wrapper to $PATH:
 
 ```
 cp ./aws-profile-gpg /usr/local/bin
@@ -71,10 +67,10 @@ $ which aws-profile-gpg
 /usr/local/bin/aws-profile-gpg
 ```
 
-__2. Adding a bash function__
+2\. Create a wrapper bash function such as:
 
 ```
-$ cat ~/.bashrc
+$ cat ~/.bash_profile
 ...
 
 # required aws-profile-gpg env
