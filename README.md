@@ -15,7 +15,7 @@ If you are not familiar with GPG, there are a number of [good tutorials online](
 
 __Homebrew__
 
-- _Follow instruction at [https://brew.sh](https://brew.sh)_
+- _Follow the install instructions at [https://brew.sh](https://brew.sh)_
 
 __Python, virtualenv__
 
@@ -104,7 +104,7 @@ function aws-profile-gpg {
 __Basic usage__
 
 ```
-usage: aws-profile-gpg.py [-h] [-v] command [command ...]
+usage: aws-profile-gpg [-h] [-v] command [command ...]
 
 positional arguments:
   command        command passed to aws cli
@@ -114,7 +114,7 @@ optional arguments:
   -v, --verbose  verbose output
 ```
 
-__Using default configuration__
+__Using the default configuration__
 
 ```
 aws-profile-gpg aws s3 ls
@@ -148,7 +148,7 @@ AWS_CONFIG_FILE=/path/to/shared/aws/config \
 aws-profile-gpg aws s3 ls
 ```
 
-Note: If you use an alternative `AWS_CONFIG_FILE`, any profile you use must be defined in specified config, including `default`.
+Note: If you use an alternative `AWS_CONFIG_FILE`, any profile you use must be defined in the specified config, including `default`.
 
 If you try to use an undefined profile, you will see this error:
 `Profile not found in config; profile=iam_leet`
@@ -162,6 +162,7 @@ If you try to use an undefined profile, you will see this error:
 
 * AWS_ENCRYPTED_CREDENTIALS_FILE
     * Path to GPG encrypted credentials file
+    * Supports both plain `.gpg` and ascii-armored `.asc` files
     * Defaults to `~/.aws/credentials.gpg`
 
 * AWS_CONFIG_FILE
@@ -180,12 +181,13 @@ If you try to use an undefined profile, you will see this error:
 * Various version of `aws-profile` on GitHub
     * [https://github.com/search?q=aws-profile](https://github.com/search?q=aws-profile)
 
-* Botocore
-    * [https://github.com/boto/botocore](https://github.com/boto/botocore)
+* GNU Privacy Guard (GPG)
+    * [https://www.gnupg.org](https://www.gnupg.org)
 
 * PyGPGME
     * [https://launchpad.net/pygpgme](https://launchpad.net/pygpgme)
     * [https://pygpgme.readthedocs.io/en/latest/](https://pygpgme.readthedocs.io/en/latest/)
 
-* GNU Privacy Guard (GPG)
-    * [https://www.gnupg.org](https://www.gnupg.org)
+* Botocore
+    * [https://github.com/boto/botocore](https://github.com/boto/botocore)
+
