@@ -1,10 +1,15 @@
 
 # aws-profile-gpg
 
-Wrapper for calling [aws-cli](https://github.com/aws/aws-cli) for access keys from an encrypted credentials file.
+A script for generating [aws-cli](https://github.com/aws/aws-cli) auth tokens from a [GPG](https://www.gnupg.org/) encrypted file allowing you to keep your credentials safe at rest.
 
+If you use an [OpenGPG card](https://en.wikipedia.org/wiki/OpenPGP_card) such as a [Yubikey](https://www.yubico.com/support/knowledge-base/categories/articles/use-yubikey-openpgp/) as a private key, you can then effectively use it as a hardware MFA device.
 
 ## Prerequisites
+
+This guide assumes you are familiar GPG and are able to encrypt your credentials file.
+
+If you are not familiar with GPG, there are a number of [good tutorials online](https://duckduckgo.com/?q=gpg+tutorial).
 
 #### MacOS
 
@@ -182,3 +187,5 @@ If you try to use an undefined profile, you will see this error:
     * [https://launchpad.net/pygpgme](https://launchpad.net/pygpgme)
     * [https://pygpgme.readthedocs.io/en/latest/](https://pygpgme.readthedocs.io/en/latest/)
 
+* GNU Privacy Guard (GPG)
+    * [https://www.gnupg.org](https://www.gnupg.org)
