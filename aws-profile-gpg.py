@@ -95,7 +95,7 @@ def main() :
     try:
         gme.decrypt( encrypted_bytes, decrypted_bytes )
     except gpgme.GpgmeError as e:
-        sys.exit( 'Unable to decrype file; {}'.format( e.strerror ) )
+        sys.exit( 'Unable to decrypt file; {}'.format( e.strerror ) )
 
     decrypted_string = decrypted_bytes.getvalue().decode('utf8')
 

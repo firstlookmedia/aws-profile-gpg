@@ -23,9 +23,9 @@ __[GnuPG Made Easy (GPGME)](https://www.gnupg.org/related_software/gpgme/)__
 - ```brew install gpgme```
 
 
-## Install
+## Setup and Install
 
-#### From Source
+#### Setup Virtualenv
 
 Download the code:
 
@@ -47,7 +47,13 @@ Install requirements:
 pip install -r requirments.txt
 ```
 
-Add `AWS_PROFILE_GPG_HOME` to `~/.bashrc`, for example:
+#### Install
+
+There are two options documented here for making the script's virtualenv easily accessible:
+
+__1. Adding a wrapper script to $PATH__
+
+Add `AWS_PROFILE_GPG_HOME` to `~/.bashrc`:
 
 ```
 $ vim ~/.bashrc
@@ -56,7 +62,7 @@ $ grep ^AWS ~/.bashrc
 export AWS_PROFILE_GPG_HOME=~/local/aws-profile-gpg
 ```
 
-Copy virtualenv wrapper to $PATH, for example:
+Copy virtualenv wrapper to $PATH:
 
 ```
 cp ./aws-profile-gpg /usr/local/bin
@@ -65,34 +71,87 @@ $ which aws-profile-gpg
 /usr/local/bin/aws-profile-gpg
 ```
 
-
-## Running
-
-__Using default configuration:__
+__2. Adding a bash function__
 
 ```
-aws-profile-gpg aws <command>
+$ cat ~/.bashrc
+...
+
+# required aws-profile-gpg env
+export AWS_PROFILE_GPG_HOME="${HOME}/local/aws-profile-gpg"
+
+# optional
+export AWS_ENCRYPTED_CREDENTIALS_FILE="${HOME}/Dropbox/aws/credentials.gpg"
+export AWS_CONFIG_FILE="${HOME}/Dropbox/aws/config"
+
+# optional
+export AWS_DEFAULT_PROFILE=default
+export AWS_DEFAULT_REGION=ca-central-1
+
+function aws-profile-gpg {
+    $AWS_PROFILE_GPG_HOME/venv/bin/python \
+    $AWS_PROFILE_GPG_HOME/aws-profile-gpg.py \
+    $@
+}
+
+...
 ```
 
-__Specifying an aws profile, for example:__
+
+## Usage
+
+__Basic usage__
+
+```
+usage: aws-profile-gpg.py [-h] [-v] command [command ...]
+
+positional arguments:
+  command        command passed to aws cli
+
+optional arguments:
+  -h, --help     show this help message and exit
+  -v, --verbose  verbose output
+```
+
+__Using default configuration__
+
+```
+aws-profile-gpg aws s3 ls
+```
+
+__Specifying an aws profile__
 
 ```
 AWS_PROFILE=iam_leet \
 aws-profile-gpg aws s3 ls
 ```
 
-_Note:_ If you use a non-default `AWS_CONFIG_FILE`, profiles must be defined in specified config or you will see this error:
+__Using with terraform__
 
-`Profile not found in config; profile=iam_leet`
+```
+AWS_PROFILE=terraform \
+aws-profile-gpg terraform -plan
+```
 
-
-__Specifying alternative config and credentials files, for example:__
+__Specifying an alternative credentials file__
 
 ```
 AWS_ENCRYPTED_CREDENTIALS_FILE=/path/to/shared/aws/credentials.asc \
+aws-profile-gpg aws s3 ls
+```
+
+__Specifying an alternative config file__
+
+```
 AWS_CONFIG_FILE=/path/to/shared/aws/config \
 aws-profile-gpg aws s3 ls
 ```
+
+Note: If you use an alternative `AWS_CONFIG_FILE`, any profile you use must be defined in specified config, including `default`.
+
+If you try to use an undefined profile, you will see this error:
+`Profile not found in config; profile=iam_leet`
+
 
 #### Environmental Variables
 
@@ -113,39 +172,6 @@ aws-profile-gpg aws s3 ls
     * See [AWS Command Line Interface](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-environment)
     * Defaults to `default`
 
-
-#### Sample Bash Helper Function
-
-```
-$ cat ~/.bashrc
-...
-
-export AWS_DEFAULT_PROFILE=default
-export AWS_DEFAULT_REGION=ca-central-1
-
-export AWS_CONFIG_FILE="${HOME}/Dropbox/aws/config"
-export AWS_ENCRYPTED_CREDENTIALS_FILE="${HOME}/Dropbox/aws/credentials.gpg"
-
-export AWS_PROFILE_GPG_HOME="${HOME}/local/aws-profile-gpg"
-
-function gawsp {
-        $AWS_PROFILE_GPG_HOME/aws-profile-gpg $@
-}
-
-...
-```
-
-Using with terraform, for example:
-
-```
-AWS_PROFILE=terraform gawsp terraform -plan
-```
-
-Or just plain aws, for example:
-
-```
-gawsp aws s3 ls
-```
 
 
 ## Related Links
