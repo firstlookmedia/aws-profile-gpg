@@ -45,7 +45,7 @@ source venv/bin/activate
 Install requirements:
 
 ```
-pip install -r requirments.txt
+pip install -r requirements.txt
 ```
 
 There are two options documented here for making the script's virtualenv easily accessible:
