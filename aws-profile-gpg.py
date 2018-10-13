@@ -25,7 +25,7 @@ def main() :
 
     parser.add_argument( 'command',
         help='command passed to aws cli',
-        nargs='+'
+        nargs=argparse.REMAINDER
     )
 
     args = parser.parse_args()
@@ -165,6 +165,9 @@ def main() :
         )
 
         role_credentials = assumed_role_object['Credentials']
+
+        if args.verbose:
+            print role_credentials
 
         os.putenv( 'AWS_ACCESS_KEY_ID', role_credentials['AccessKeyId'] )
         os.putenv( 'AWS_SECRET_ACCESS_KEY', role_credentials['SecretAccessKey'] )
