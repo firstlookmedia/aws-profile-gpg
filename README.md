@@ -7,15 +7,15 @@ The script is inspired by the various [aws-profile](https://github.com/search?q=
 
 ## Benefits
 
-1\. Your secret access keys are encrypted at rest on disk so if someone gains access to your machine, they still won't have access to your AWS credentials.
+1\. Your secret access keys are encrypted at rest on disk so if someone gains access to your machine, they still won't have access to your AWS credentials
 
-2\. You can safely store your encrypted credentials in Dropbox or on a server so you can access the same config and credentials files from multiple machines.
+2\. You can safely store your encrypted credentials in Dropbox or on a server so you can access the same config and credentials files from multiple machines
 
-3\. Since the script works by decrypting the credentials file and adding `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` to the processes environment, you can use it with other apps the use these environment variables, e.g. [Terraform](https://www.terraform.io/docs/providers/aws/).
+3\. Since the script works by decrypting the credentials file and adding `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` to the processes environment, you can use it with other apps the use these environment variables, e.g. [Terraform](https://www.terraform.io/docs/providers/aws/)
 
-4\. If you use an [OpenGPG card](https://en.wikipedia.org/wiki/OpenPGP_card) such as a [Yubikey](https://www.yubico.com/support/knowledge-base/categories/articles/use-yubikey-openpgp/) as a private key, it will effectively act as a hardware MFA device for your access keys.
+4\. If you use an [OpenGPG card](https://en.wikipedia.org/wiki/OpenPGP_card) such as a [Yubikey](https://www.yubico.com/support/knowledge-base/categories/articles/use-yubikey-openpgp/) as a private key, it will effectively act as a hardware MFA device for your access keys
 
-_More uses are in __Usage__ below._
+_Details and use cases are outlined in __Usage__ below._
 
 ## Prerequisites
 
@@ -26,8 +26,8 @@ This guide assumes you are familiar GPG and are able to encrypt your credentials
 #### Using Homebrew ####
 
 ```
-brew tap jefforulez/aws-profile-gpg
-brew install jefforulez/aws-profile-gpg
+brew tap firstlookmedia/aws-profile-gpg
+brew install firstlookmedia/aws-profile-gpg
 ```
 
 #### Bash Shortcuts
