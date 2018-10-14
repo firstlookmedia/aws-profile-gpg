@@ -8,9 +8,5 @@ setup(
     long_description=open('README.md').read(),
     url='https://github.com/jefforulez/aws-profile-gpg',
     python_requires='~=2.7',
-    entry_points={
-        'console_scripts': [
-            'aws-profile-gpg=aws-profile-gpg.__main__:main',
-        ],
-    },
+    scripts=['bin/aws-profile-gpg'],
 )
