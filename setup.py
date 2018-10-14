@@ -16,6 +16,6 @@ setup(
     python_requires='~=2.7',
     install_requires=[
        'botocore>=1.4,<2',
-       'PyGPGME=0.3',
+       'PyGPGME>=0.3,<1',
     ]
 )
