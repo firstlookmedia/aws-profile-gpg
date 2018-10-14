@@ -1,99 +1,60 @@
 
 # aws-profile-gpg
 
-A script for generating [aws-cli](https://github.com/aws/aws-cli) auth tokens from a [GPG](https://www.gnupg.org/) encrypted file allowing you to keep your credentials safe at rest.
+A script for calling the [aws-cli](https://github.com/aws/aws-cli) using [IAM Access Keys](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html) from a [GPG](https://www.gnupg.org/) encrypted credentials file.
 
-If you use an [OpenGPG card](https://en.wikipedia.org/wiki/OpenPGP_card) such as a [Yubikey](https://www.yubico.com/support/knowledge-base/categories/articles/use-yubikey-openpgp/) as a private key, you can then effectively use it as a hardware MFA device.
+The script is inspired by the various [aws-profile](https://github.com/search?q=aws-profile) wrappers found on GitHub, plus a desire to keep credentials encrypted at rest.
+
+## Benefits
+
+1\. Your secret access keys are encrypted at rest on disk so if someone gains access to your machine, they still won't have access to your AWS credentials.
+
+2\. You can safely store your encrypted credentials in Dropbox or on a server so you can access the same config and credentials files from multiple machines.
+
+3\. Since the script works by decrypting the credentials file and adding `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` to the processes environment, you can use it with other apps the use these environment variables, e.g. [Terraform](https://www.terraform.io/docs/providers/aws/).
+
+4\. If you use an [OpenGPG card](https://en.wikipedia.org/wiki/OpenPGP_card) such as a [Yubikey](https://www.yubico.com/support/knowledge-base/categories/articles/use-yubikey-openpgp/) as a private key, it will effectively act as a hardware MFA device for your access keys.
+
+_More uses are in __Usage__ below._
 
 ## Prerequisites
 
 This guide assumes you are familiar GPG and are able to encrypt your credentials file.  If you are not familiar with GPG, there are a number of [good tutorials online](https://duckduckgo.com/?q=gpg+tutorial).
 
-#### MacOS
+## Install
 
-__Homebrew__
-
-- _Follow the install instructions at [https://brew.sh](https://brew.sh)_
-
-__Python, virtualenv__
-
-- ```brew install python```
-
-- ```pip install virtualenv```
-
-__[GnuPG Made Easy (GPGME)](https://www.gnupg.org/related_software/gpgme/)__
-
-- ```brew install gpgme```
-
-
-## Setup and Install
-
-Download the code:
+#### Using Homebrew ####
 
 ```
-git clone https://github.com/firstlookmedia/aws-profile-gpg.git
-cd ./aws-profile-gpg
+brew tap jefforulez/aws-profile-gpg
+brew install jefforulez/aws-profile-gpg
 ```
 
-Create a virtualenv:
+#### Bash Shortcuts
 
-```
-virtualenv venv
-source venv/bin/activate
-```
-
-Install requirements:
-
-```
-pip install -r requirements.txt
-```
-
-There are two options documented here for making the script's virtualenv easily accessible:
-
-1\. Move the provided wrapper script to a directory in the $PATH:
-
-- Add `AWS_PROFILE_GPG_HOME` to `~/.bash_profile`:
-
-```
-$ vim ~/.bash_profile
-...
-$ grep ^AWS ~/.bash_profile
-export AWS_PROFILE_GPG_HOME=~/local/aws-profile-gpg
-```
-
-- Copy virtualenv wrapper to $PATH:
-
-```
-cp ./aws-profile-gpg /usr/local/bin
-
-$ which aws-profile-gpg
-/usr/local/bin/aws-profile-gpg
-```
-
-2\. Create a wrapper bash function such as:
+Creating shell functions is helpful for quickly invoking different profiles:
 
 ```
 $ cat ~/.bash_profile
-...
-
-# required aws-profile-gpg env
-export AWS_PROFILE_GPG_HOME="${HOME}/local/aws-profile-gpg"
 
 # optional
 export AWS_ENCRYPTED_CREDENTIALS_FILE="${HOME}/Dropbox/aws/credentials.gpg"
 export AWS_CONFIG_FILE="${HOME}/Dropbox/aws/config"
 
-# optional
-export AWS_DEFAULT_PROFILE=default
-export AWS_DEFAULT_REGION=ca-central-1
-
-function aws-profile-gpg {
-    $AWS_PROFILE_GPG_HOME/venv/bin/python \
-    $AWS_PROFILE_GPG_HOME/aws-profile-gpg.py \
-    $@
+function aws-leet {
+  AWS_PROFILE=iam_leet \
+  aws-profile-gpg \
+  aws \
+  $@
 }
 
-...
+function aws-terraform {
+  AWS_PROFILE=terraform \
+  aws-profile-gpg \
+  aws \
+  $@
+}
+
 ```
 
 
@@ -122,31 +83,54 @@ __Specifying an aws profile__
 
 ```
 AWS_PROFILE=iam_leet \
-aws-profile-gpg aws s3 ls
-```
-
-__Using with terraform__
-
-```
-AWS_PROFILE=terraform \
-aws-profile-gpg terraform -plan
+  aws-profile-gpg aws s3 ls
 ```
 
 __Specifying an alternative credentials file__
 
 ```
 AWS_ENCRYPTED_CREDENTIALS_FILE=/path/to/shared/aws/credentials.asc \
-aws-profile-gpg aws s3 ls
+  aws-profile-gpg aws s3 ls
 ```
 
 __Specifying an alternative config file__
 
 ```
 AWS_CONFIG_FILE=/path/to/shared/aws/config \
-aws-profile-gpg aws s3 ls
+  aws-profile-gpg aws s3 ls
 ```
 
-Note: If you use an alternative `AWS_CONFIG_FILE`, any profile you use must be defined in the specified config, including `default`.
+__Storing config and credentials files in Dropbox__
+
+```
+AWS_CONFIG_FILE=${HOME}/Dropbox/etc/aws/config \
+  AWS_ENCRYPTED_CREDENTIALS_FILE=${HOME}/Dropbox/aws/credentials.gpg \
+  aws-profile-gpg aws s3 ls
+```
+
+__Using with terraform__
+
+```
+AWS_PROFILE=terraform \
+  aws-profile-gpg terraform -plan
+```
+
+
+#### Note on Config Files
+
+The `AWS_PROFILE` you use must be defined in your `AWS_CONFIG_FILE` file, e.g.
+
+```
+$ cat ~/.aws/config
+
+[profile default]
+region=us-east-1
+
+[profile iam_leet]
+region=us-east-1
+```
+
+This applies to the `default` profile too.
 
 If you try to use an undefined profile, you will see this error:
 `Profile not found in config; profile=iam_leet`
@@ -188,4 +172,3 @@ If you try to use an undefined profile, you will see this error:
 
 * Botocore
     * [https://github.com/boto/botocore](https://github.com/boto/botocore)
-
