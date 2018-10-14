@@ -1,0 +1,190 @@
+#!/usr/bin/env python
+
+import io
+import os
+import sys
+
+import argparse
+import ConfigParser
+
+import botocore.session
+import gpgme
+
+def main() :
+
+    #
+    # parse args
+    #
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument( '-v', '--verbose',
+        help='verbose output',
+        action='store_true'
+    )
+
+    parser.add_argument( 'command',
+        help='command passed to aws cli',
+        nargs=argparse.REMAINDER
+    )
+
+    args = parser.parse_args()
+
+    command = ' '.join( args.command )
+
+    credentials_file = str( os.getenv( 'AWS_ENCRYPTED_CREDENTIALS_FILE', '~/.aws/credentials.gpg' ) )
+    config_file      = str( os.getenv( 'AWS_CONFIG_FILE', '~/.aws/config' ) )
+    profile          = str( os.getenv( 'AWS_PROFILE', os.getenv( 'AWS_DEFAULT_PROFILE', 'default' ) ) )
+
+    if args.verbose:
+        print 'AWS_ENCRYPTED_CREDENTIALS_FILE={}'.format( credentials_file )
+        print 'AWS_CONFIG_FILE={}'.format( config_file )
+        print 'AWS_DEFAULT_PROFILE={}'.format( profile )
+        print 'command:', command
+
+    #
+    # parse config
+    #
+
+    config = ConfigParser.ConfigParser()
+    config.read( os.path.expanduser( config_file ) )
+
+    config_section = 'profile ' + profile
+
+    source_profile = profile
+    role_arn = None
+
+    if config.has_option( config_section, 'source_profile' ):
+        source_profile = config.get( config_section, 'source_profile' )
+
+    if config.has_option( config_section, 'role_arn' ):
+        role_arn = config.get( config_section, 'role_arn' )
+
+    if args.verbose:
+        print 'source_profile=' + str(source_profile)
+        print 'role_arn=' + str(role_arn)
+
+    #
+    # read encrypted file
+    #
+
+    credentials_file = os.path.expanduser( credentials_file )
+
+    if not os.path.exists( credentials_file ):
+        sys.exit( 'Unable to find credentials file, {}'.format( credentials_file ) )
+
+    try:
+        with open( credentials_file, mode='rb') as file:
+            encrypted = file.read()
+
+    except IOError as e:
+        sys.exit( 'I/O error({0}): {1}; credentials_file: {2}'.format( e.errno, e.strerror, credentials_file ) )
+
+    except:
+        sys.exit( 'Unexpected error:'.format( sys.exc_info()[0] ) )
+
+    #
+    # gpgme
+    #
+
+    gme = gpgme.Context()
+
+    encrypted_bytes = io.BytesIO( encrypted )
+    decrypted_bytes = io.BytesIO()
+
+    try:
+        gme.decrypt( encrypted_bytes, decrypted_bytes )
+    except gpgme.GpgmeError as e:
+        sys.exit( 'Unable to decrypt file; {}'.format( e.strerror ) )
+
+    decrypted_string = decrypted_bytes.getvalue().decode('utf8')
+
+    #
+    # parse credentials
+    #
+
+    # make sure to read all of decrypted_bytes
+    decrypted_bytes.seek(0)
+
+    credentials = ConfigParser.ConfigParser()
+    credentials.readfp( decrypted_bytes )
+
+    if not credentials.has_section( source_profile ):
+        sys.exit( 'Credentials file does not have source_profile "{}", AWS_PROFILE={}'.format(
+            source_profile, profile
+        ) )
+
+    if not credentials.has_option( source_profile, 'aws_access_key_id' ):
+        sys.exit( 'Credentials file source_profile does not have aws_access_key_id, {}'.format( source_profile ) )
+
+    if not credentials.has_option( source_profile, 'aws_secret_access_key' ):
+        sys.exit( 'Credentials file source_profile does not have aws_secret_access_key, {}'.format( source_profile ) )
+
+    aws_access_key_id = credentials.get( source_profile, 'aws_access_key_id' )
+    aws_secret_access_key = credentials.get( source_profile, 'aws_secret_access_key' )
+
+    #
+    # setup a botocore session
+    #
+
+    session = botocore.session.Session(
+        profile=profile
+    )
+    session.set_credentials(
+        aws_access_key_id,
+        aws_secret_access_key
+    )
+
+    try:
+        scoped_config = session.get_scoped_config()
+        region = scoped_config.get('region', None )
+        if region:
+            os.putenv('AWS_DEFAULT_REGION', region)
+            os.putenv('AWS_REGION', region)
+
+    except botocore.exceptions.ProfileNotFound as e:
+        sys.exit( 'Profile not found in config; profile={}'.format( profile ) )
+
+    if args.verbose:
+        print 'AWS_DEFAULT_REGION={}'.format( region )
+
+    #
+    # switch iam roles using sts
+    #
+
+    if role_arn == None :
+        os.putenv( 'AWS_ACCESS_KEY_ID', aws_access_key_id )
+        os.putenv( 'AWS_SECRET_ACCESS_KEY', aws_secret_access_key )
+
+    else:
+        sts_client = session.create_client('sts')
+
+        assumed_role_object = sts_client.assume_role(
+            RoleArn=role_arn,
+            RoleSessionName='AssumeRoleSession1'
+        )
+
+        role_credentials = assumed_role_object['Credentials']
+
+        if args.verbose:
+            print role_credentials
+
+        os.putenv( 'AWS_ACCESS_KEY_ID', role_credentials['AccessKeyId'] )
+        os.putenv( 'AWS_SECRET_ACCESS_KEY', role_credentials['SecretAccessKey'] )
+        os.putenv( 'AWS_SESSION_TOKEN', role_credentials['SessionToken'] )
+
+    #
+    # run the command
+    #
+
+    if args.verbose:
+        print 'Command output:'
+
+    my_env = os.environ.copy()
+    command_status = os.system( command )
+
+    exit( os.WEXITSTATUS( command_status ) )
+
+
+if __name__ == "__main__":
+    main()
