@@ -26,6 +26,7 @@ This guide assumes you are familiar GPG and are able to encrypt your credentials
 #### Using Homebrew ####
 
 ```
+brew tap jefforulez/aws-profile-gpg
 brew install jefforulez/aws-profile-gpg
 ```
 
