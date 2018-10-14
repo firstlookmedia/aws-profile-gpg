@@ -10,7 +10,7 @@ setup(
     python_requires='~=2.7',
     entry_points={
         'console_scripts': [
-            'aws-profile-gpg=aws-profile-gpg:main',
+            'aws-profile-gpg=aws-profile-gpg.__main__:main',
         ],
     },
 )
