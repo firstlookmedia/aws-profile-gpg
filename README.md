@@ -26,8 +26,8 @@ This guide assumes you are familiar GPG and are able to encrypt your credentials
 #### Using Homebrew ####
 
 ```
-brew tap firstlookmedia/aws-profile-gpg
-brew install firstlookmedia/aws-profile-gpg
+brew tap firstlookmedia/firstlookmediaa
+brew install aws-profile-gpg
 ```
 
 #### Bash Shortcuts
