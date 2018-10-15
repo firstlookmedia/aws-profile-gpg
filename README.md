@@ -26,10 +26,15 @@ This guide assumes you are familiar GPG and are able to encrypt your credentials
 #### Using Homebrew ####
 
 ```
-brew tap firstlookmedia/firstlookmediaa
-brew install aws-profile-gpg
+brew bundle
 ```
 
+or
+
+```
+brew tap firstlookmedia/firstlookmedia
+brew install aws-profile-gpg
+```
 
 ## Usage
 
