@@ -5,7 +5,10 @@ import os
 import sys
 
 import argparse
-import ConfigParser
+try:
+    import configparser
+except:
+    import ConfigParser as configparser
 
 import botocore.session
 import gpgme
@@ -37,16 +40,16 @@ def main() :
     profile          = str( os.getenv( 'AWS_PROFILE', os.getenv( 'AWS_DEFAULT_PROFILE', 'default' ) ) )
 
     if args.verbose:
-        print 'AWS_ENCRYPTED_CREDENTIALS_FILE={}'.format( credentials_file )
-        print 'AWS_CONFIG_FILE={}'.format( config_file )
-        print 'AWS_DEFAULT_PROFILE={}'.format( profile )
-        print 'command:', command
+        print('AWS_ENCRYPTED_CREDENTIALS_FILE={}'.format( credentials_file ))
+        print('AWS_CONFIG_FILE={}'.format( config_file ))
+        print('AWS_DEFAULT_PROFILE={}'.format( profile ))
+        print('command:', command)
 
     #
     # parse config
     #
 
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config.read( os.path.expanduser( config_file ) )
 
     config_section = 'profile ' + profile
@@ -61,8 +64,8 @@ def main() :
         role_arn = config.get( config_section, 'role_arn' )
 
     if args.verbose:
-        print 'source_profile=' + str(source_profile)
-        print 'role_arn=' + str(role_arn)
+        print('source_profile=' + str(source_profile))
+        print('role_arn=' + str(role_arn))
 
     #
     # read encrypted file
@@ -146,7 +149,7 @@ def main() :
         sys.exit( 'Profile not found in config; profile={}'.format( profile ) )
 
     if args.verbose:
-        print 'AWS_DEFAULT_REGION={}'.format( region )
+        print('AWS_DEFAULT_REGION={}'.format( region ))
 
     #
     # switch iam roles using sts
@@ -167,7 +170,7 @@ def main() :
         role_credentials = assumed_role_object['Credentials']
 
         if args.verbose:
-            print role_credentials
+            print(role_credentials)
 
         os.putenv( 'AWS_ACCESS_KEY_ID', role_credentials['AccessKeyId'] )
         os.putenv( 'AWS_SECRET_ACCESS_KEY', role_credentials['SecretAccessKey'] )
@@ -178,7 +181,7 @@ def main() :
     #
 
     if args.verbose:
-        print 'Command output:'
+        print('Command output:')
 
     my_env = os.environ.copy()
     command_status = os.system( command )
