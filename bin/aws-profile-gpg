@@ -6,9 +6,12 @@ import sys
 
 import argparse
 try:
+    # Python 3
     import configparser
 except:
+    # Python 2
     import ConfigParser as configparser
+    import StringIO
 
 import botocore.session
 import gpgme
@@ -109,8 +112,14 @@ def main() :
     # make sure to read all of decrypted_bytes
     decrypted_bytes.seek(0)
 
-    credentials = ConfigParser.ConfigParser()
-    credentials.readfp( decrypted_bytes )
+    credentials = configparser.ConfigParser()
+    try:
+        # Python 3's configparser supports read_string
+        credentials.read_string( decrypted_string )
+    except:
+        # For Python 2, make the credentials file-like
+        buf = StringIO.StringIO( decrypted_string )
+        credentials.readfp( buf )
 
     if not credentials.has_section( source_profile ):
         sys.exit( 'Credentials file does not have source_profile "{}", AWS_PROFILE={}'.format(
