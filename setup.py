@@ -1,14 +1,15 @@
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name='aws-profile-gpg',
-    version='0.0.1',
     author="jeff oconnell",
     author_email="jeff.oconnell@firstlook.media",
     license="MIT",
 
-    url='https://github.com/jefforulez/aws-profile-gpg',
+    url='https://github.com/firstlookmedia/aws-profile-gpg',
+
+    version='0.0.2',
 
     description='call aws-cli using access keys from an encrypted credentials file',
     long_description=open('README.md').read(),
@@ -16,9 +17,10 @@ setup(
 
     scripts=['bin/aws-profile-gpg'],
 
-    python_requires='~=2.7',
+    python_requires='>=2.6, !=3.0.*, !=3.1.*, !=3.2.*, <4',
+
     install_requires=[
-       'botocore>=1.4,<2',
+       'botocore>=1.12,<2',
        'PyGPGME>=0.3,<1',
     ],
 

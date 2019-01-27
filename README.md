@@ -23,7 +23,7 @@ This guide assumes you are familiar GPG and are able to encrypt your credentials
 
 ## Install
 
-#### Using Homebrew ####
+#### Using Homebrew
 
 ```
 brew bundle
@@ -34,6 +34,12 @@ or
 ```
 brew tap firstlookmedia/firstlookmedia
 brew install aws-profile-gpg
+```
+
+#### Using PyPI
+
+```
+pip install aws-profile-gpg
 ```
 
 ## Usage
@@ -198,3 +204,4 @@ If you try to use an undefined profile, you will see this error:
 
 * Botocore
     * [https://github.com/boto/botocore](https://github.com/boto/botocore)
+
